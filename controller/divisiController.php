@@ -12,7 +12,7 @@ class DivisiController
 
     public function all()
     {
-        $sql = "SELECT * FROM division ORDER BY id DESC";
+        $sql = "SELECT * FROM division ORDER BY division_name ASC";
         $result = mysql_query($sql, $this->conn);
         if (!$result) {
             return false;
@@ -39,10 +39,11 @@ class DivisiController
     public function create($data)
     {
         $division_name = mysql_real_escape_string($data['division_name'], $this->conn);
+        $divisi_code   = isset($data['divisi_code']) ? mysql_real_escape_string($data['divisi_code'], $this->conn) : '';
         $description   = isset($data['description']) ? mysql_real_escape_string($data['description'], $this->conn) : '';
 
-        $sql = "INSERT INTO division (division_name, description)
-                VALUES ('{$division_name}', '{$description}')";
+        $sql = "INSERT INTO division (division_name, divisi_code, description)
+                VALUES ('{$division_name}', '{$divisi_code}', '{$description}')";
         $result = mysql_query($sql, $this->conn);
         if (!$result) {
             return false;
@@ -54,10 +55,12 @@ class DivisiController
     {
         $id            = (int) $id;
         $division_name = mysql_real_escape_string($data['division_name'], $this->conn);
+        $divisi_code   = isset($data['divisi_code']) ? mysql_real_escape_string($data['divisi_code'], $this->conn) : '';
         $description   = isset($data['description']) ? mysql_real_escape_string($data['description'], $this->conn) : '';
 
         $sql = "UPDATE division
                 SET division_name = '{$division_name}',
+                    divisi_code = '{$divisi_code}',
                     description = '{$description}'
                 WHERE id = {$id}";
         return mysql_query($sql, $this->conn) ? true : false;

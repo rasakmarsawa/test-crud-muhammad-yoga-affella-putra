@@ -1,20 +1,21 @@
 <?php
-require_once __DIR__ . '/connection.php';
-require_once __DIR__ . '/controller/divisiController.php';
-require_once __DIR__ . '/controller/karyawanController.php';
+require_once __DIR__ . '/../connection.php';
+require_once __DIR__ . '/../controller/divisiController.php';
+require_once __DIR__ . '/../controller/karyawanController.php';
+require_once __DIR__ . '/../utils/validation.php';
 
 $divisiController   = new DivisiController($conn);
 $karyawanController = new KaryawanController($conn);
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id <= 0) {
-    header('Location: index.php');
+    header('Location: home.php');
     exit;
 }
 
 $row = $karyawanController->find($id);
 if (!$row) {
-    header('Location: index.php?error=notfound');
+    header('Location: home.php?error=notfound');
     exit;
 }
 
@@ -53,12 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($data['email'] === '') {
         $errors[] = 'Email wajib diisi.';
+    } elseif (!is_valid_email($data['email'])) {
+        $errors[] = 'Format email tidak valid.';
     }
     if ($data['fullname'] === '') {
         $errors[] = 'Nama lengkap wajib diisi.';
     }
     if ($data['NIK'] === '') {
         $errors[] = 'NIK wajib diisi.';
+    } elseif (!is_number_only($data['NIK'])) {
+        $errors[] = 'NIK harus berupa angka saja.';
     }
     if ($data['gender'] !== 'L' && $data['gender'] !== 'P') {
         $errors[] = 'Gender wajib dipilih.';
@@ -67,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $ok = $karyawanController->update($id, $data);
         if ($ok) {
-            header('Location: index.php?updated=1');
+            header('Location: home.php?updated=1');
             exit;
         } else {
             $errors[] = 'Gagal memperbarui data: ' . mysql_error($conn);
@@ -76,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>CRUD Test | Edit Karyawan</title>
@@ -99,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="frontend_template/admin-lte-v4.10.1/dist/css/adminlte.css" />
+    <link rel="stylesheet" href="../frontend_template/admin-lte-v4.10.1/dist/css/adminlte.css" />
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -111,30 +116,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="bi bi-list"></i>
               </a>
             </li>
-            <li class="nav-item d-none d-md-block"><a href="index.php" class="nav-link">Home</a></li>
+            <li class="nav-item d-none d-md-block"><a href="home.php" class="nav-link">Home</a></li>
           </ul>
         </div>
       </nav>
 
-      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-        <div class="sidebar-brand">
-          <a href="index.php" class="brand-link">
-            <span class="brand-text fw-light">CRUD Test</span>
-          </a>
-        </div>
-        <div class="sidebar-wrapper">
-          <nav class="mt-2">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation">
-              <li class="nav-item">
-                <a href="index.php" class="nav-link active">
-                  <i class="nav-icon bi bi-people"></i>
-                  <p>Karyawan</p>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </aside>
+      <?php include __DIR__ . '/sidebar.php'; ?>
 
       <main class="app-main">
         <div class="app-content-header">
@@ -146,8 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div class="col-sm-6">
                 <nav aria-label="breadcrumb">
                   <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                    <li class="breadcrumb-item"><a href="index.php">Karyawan</a></li>
+                    <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+                    <li class="breadcrumb-item"><a href="home.php">Karyawan</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Edit</li>
                   </ol>
                 </nav>
@@ -183,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           <option value="">-- Pilih Divisi --</option>
                           <?php foreach ($divisions as $div) : ?>
                             <option value="<?php echo htmlspecialchars($div['id']); ?>" <?php echo ($data['division_id'] == $div['id']) ? 'selected' : ''; ?>>
-                              <?php echo htmlspecialchars($div['division_name']); ?>
+                              <?php echo htmlspecialchars($div['division_name']).' - '.htmlspecialchars($div['divisi_code']); ?>
                             </option>
                           <?php endforeach; ?>
                         </select>
@@ -212,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="col-md-6 mb-3">
                           <label for="NIK" class="form-label">NIK</label>
-                          <input type="text" id="NIK" name="NIK" class="form-control" value="<?php echo htmlspecialchars($data['NIK']); ?>" required maxlength="20" />
+                          <input type="text" id="NIK" name="NIK" class="form-control" value="<?php echo htmlspecialchars($data['NIK']); ?>" required maxlength="20" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
                         </div>
                       </div>
 
@@ -236,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="card-footer">
                       <button type="submit" class="btn btn-warning"><i class="bi bi-save"></i> Perbarui</button>
-                      <a href="index.php" class="btn btn-secondary">Batal</a>
+                      <a href="home.php" class="btn btn-secondary">Batal</a>
                     </div>
                   </form>
                 </div>
@@ -264,6 +251,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
       crossorigin="anonymous"
     ></script>
-    <script src="frontend_template/admin-lte-v4.10.1/dist/js/adminlte.js"></script>
+    <script src="../frontend_template/admin-lte-v4.10.1/dist/js/adminlte.js"></script>
   </body>
 </html>

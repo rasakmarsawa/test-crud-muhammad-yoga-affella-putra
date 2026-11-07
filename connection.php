@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 $host     = getenv('DB_HOST') ? getenv('DB_HOST') : 'db';
 $port     = getenv('DB_PORT') ? getenv('DB_PORT') : '3306';
 $username = getenv('DB_USER') ? getenv('DB_USER') : 'app';

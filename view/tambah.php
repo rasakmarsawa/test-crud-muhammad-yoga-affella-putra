@@ -29,31 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $old[$key] = isset($_POST[$key]) ? trim($_POST[$key]) : '';
     }
 
-    if ($old['division_id'] === '') {
-        $errors[] = 'Divisi wajib dipilih.';
-    }
-    if ($old['username'] === '') {
-        $errors[] = 'Username wajib diisi.';
-    }
-    if ($old['password'] === '') {
-        $errors[] = 'Password wajib diisi.';
-    }
-    if ($old['email'] === '') {
-        $errors[] = 'Email wajib diisi.';
-    } elseif (!is_valid_email($old['email'])) {
-        $errors[] = 'Format email tidak valid.';
-    }
-    if ($old['fullname'] === '') {
-        $errors[] = 'Nama lengkap wajib diisi.';
-    }
-    if ($old['NIK'] === '') {
-        $errors[] = 'NIK wajib diisi.';
-    } elseif (!is_number_only($old['NIK'])) {
-        $errors[] = 'NIK harus berupa angka saja.';
-    }
-    if ($old['gender'] !== 'L' && $old['gender'] !== 'P') {
-        $errors[] = 'Gender wajib dipilih.';
-    }
+    $e = validate_required($old['division_id'], 'Divisi'); if ($e) { $errors[] = $e; }
+    $e = validate_required($old['username'], 'Username'); if ($e) { $errors[] = $e; }
+    $e = validate_required($old['password'], 'Password'); if ($e) { $errors[] = $e; }
+    $e = validate_email_field($old['email'], 'Email'); if ($e) { $errors[] = $e; }
+    $e = validate_required($old['fullname'], 'Nama lengkap'); if ($e) { $errors[] = $e; }
+    $e = validate_number_field($old['NIK'], 'NIK'); if ($e) { $errors[] = $e; }
+    $e = validate_in($old['gender'], array('L', 'P'), 'Gender'); if ($e) { $errors[] = $e; }
 
     if (empty($errors)) {
         $id = $karyawanController->create($old);

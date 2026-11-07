@@ -22,6 +22,24 @@ $_current = basename($_SERVER['PHP_SELF']);
                   <p>Divisi</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="permit.php" class="nav-link <?php echo ($_current === 'permit.php' || $_current === 'permit_tambah.php' || $_current === 'permit_edit.php') ? 'active' : ''; ?>">
+                  <i class="nav-icon bi bi-card-checklist"></i>
+                  <p>Permit</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="karyawan_permit.php" class="nav-link <?php echo ($_current === 'karyawan_permit.php' || $_current === 'karyawan_permit_tambah.php' || $_current === 'karyawan_permit_edit.php' || $_current === 'karyawan_permit_pakai.php') ? 'active' : ''; ?>">
+                  <i class="nav-icon bi bi-journal-check"></i>
+                  <p>Permit Karyawan</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="permit_usage.php" class="nav-link <?php echo ($_current === 'permit_usage.php') ? 'active' : ''; ?>">
+                  <i class="nav-icon bi bi-clock-history"></i>
+                  <p>Penggunaan Permit</p>
+                </a>
+              </li>
             </ul>
           </nav>
         </div>

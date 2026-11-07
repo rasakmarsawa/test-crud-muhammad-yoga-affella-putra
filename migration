@@ -54,11 +54,43 @@ $queries[] = "CREATE TABLE IF NOT EXISTS karyawan (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
+$queries[] = "CREATE TABLE IF NOT EXISTS permit (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    permit_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+$queries[] = "CREATE TABLE IF NOT EXISTS karyawan_permit (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    karyawan_id BIGINT UNSIGNED NOT NULL,
+    permit_id BIGINT UNSIGNED NOT NULL,
+    year YEAR NOT NULL,
+    days_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_karyawan_permit (karyawan_id, permit_id, year),
+    CONSTRAINT fk_kp_karyawan FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_kp_permit FOREIGN KEY (permit_id) REFERENCES permit(id) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+$queries[] = "CREATE TABLE IF NOT EXISTS permit_usage (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    karyawan_permit_id BIGINT UNSIGNED NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    amount_date INT UNSIGNED NOT NULL,
+    is_false_entry TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_pu_kp FOREIGN KEY (karyawan_permit_id) REFERENCES karyawan_permit(id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
 foreach ($queries as $q) {
     if (!mysql_query($q, $conn)) {
         die('Migration failed: ' . mysql_error() . PHP_EOL . 'SQL: ' . $q . PHP_EOL);
     }
 }
 
-echo "Tables `division`, `karyawan` ready." . PHP_EOL;
+echo "Tables `division`, `karyawan`, `permit`, `karyawan_permit`, `permit_usage` ready." . PHP_EOL;
 mysql_close($conn);

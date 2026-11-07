@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../controller/divisiController.php';
+require_once __DIR__ . '/../utils/validation.php';
 
 $divisiController = new DivisiController($conn);
 $errors = array();
@@ -9,12 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($old as $k => $v) {
         $old[$k] = isset($_POST[$k]) ? trim($_POST[$k]) : '';
     }
-    if ($old['division_name'] === '') {
-        $errors[] = 'Nama divisi wajib diisi.';
-    }
-    if ($old['divisi_code'] !== '' && strlen($old['divisi_code']) > 5) {
-        $errors[] = 'Kode divisi maksimal 5 karakter.';
-    }
+    $e = validate_required($old['division_name'], 'Nama divisi'); if ($e) { $errors[] = $e; }
+    $e = validate_max_length($old['divisi_code'], 5, 'Kode divisi'); if ($e) { $errors[] = $e; }
     if (empty($errors)) {
         $id = $divisiController->create($old);
         if ($id) {

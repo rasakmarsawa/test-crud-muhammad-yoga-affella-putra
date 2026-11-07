@@ -57,6 +57,7 @@ if (isset($_GET['updated'])) {
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../frontend_template/admin-lte-v4.10.1/dist/css/adminlte.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -111,8 +112,9 @@ if (isset($_GET['updated'])) {
                       <a href="tambah.php" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Tambah</a>
                     </div>
                   </div>
-                  <div class="card-body p-0">
-                    <table class="table table-striped table-hover">
+                  <div class="card-body">
+                    <table id="karyawanTable" class="table table-striped table-hover">
+
                       <thead>
                         <tr>
                           <th>Username</th>
@@ -170,5 +172,15 @@ if (isset($_GET['updated'])) {
       crossorigin="anonymous"
     ></script>
     <script src="../frontend_template/admin-lte-v4.10.1/dist/js/adminlte.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+      $(function () {
+        $('#karyawanTable').DataTable({
+          columnDefs: [{ targets: -1, orderable: false, searchable: false }]
+        });
+      });
+    </script>
   </body>
 </html>

@@ -36,6 +36,7 @@ if (isset($_GET['rolled'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="../frontend_template/admin-lte-v4.10.1/dist/css/adminlte.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -81,8 +82,21 @@ if (isset($_GET['rolled'])) {
                   <div class="card-header">
                     <h3 class="card-title">Daftar Penggunaan Permit</h3>
                   </div>
-                  <div class="card-body p-0">
-                    <table class="table table-striped table-hover">
+                  <div class="card-body">
+                    <div class="row mb-3 g-2 align-items-end">
+                      <div class="col-sm-3">
+                        <label for="filterStart" class="form-label mb-1">Dari Tanggal (mulai &amp; selesai)</label>
+                        <input type="date" id="filterStart" class="form-control form-control-sm" />
+                      </div>
+                      <div class="col-sm-3">
+                        <label for="filterEnd" class="form-label mb-1">Sampai Tanggal (mulai &amp; selesai)</label>
+                        <input type="date" id="filterEnd" class="form-control form-control-sm" />
+                      </div>
+                      <div class="col-sm-2">
+                        <button type="button" id="filterReset" class="btn btn-secondary btn-sm w-100">Reset</button>
+                      </div>
+                    </div>
+                    <table id="permitUsageTable" class="table table-striped table-hover">
                       <thead>
                         <tr>
                           <th>Karyawan</th>
@@ -128,5 +142,44 @@ if (isset($_GET['rolled'])) {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="../frontend_template/admin-lte-v4.10.1/dist/js/adminlte.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+      $(function () {
+        $.fn.dataTable.ext.search.push(function (settings, data) {
+          if (settings.nTable.id !== 'permitUsageTable') {
+            return true;
+          }
+          var min = $('#filterStart').val();
+          var max = $('#filterEnd').val();
+          var start = data[3] || '';
+          var end = data[4] || '';
+          if (!min && !max) {
+            return true;
+          }
+          if (min && (start < min || end < min)) {
+            return false;
+          }
+          if (max && (start > max || end > max)) {
+            return false;
+          }
+          return true;
+        });
+
+        var table = $('#permitUsageTable').DataTable({
+          order: [[3, 'desc']],
+          columnDefs: [{ targets: -1, orderable: false, searchable: false }]
+        });
+
+        $('#filterStart, #filterEnd').on('change', function () {
+          table.draw();
+        });
+        $('#filterReset').on('click', function () {
+          $('#filterStart, #filterEnd').val('');
+          table.draw();
+        });
+      });
+    </script>
   </body>
 </html>

@@ -48,6 +48,7 @@ if (isset($_GET['used'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="../frontend_template/admin-lte-v4.10.1/dist/css/adminlte.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -111,8 +112,8 @@ if (isset($_GET['used'])) {
 
             <div class="card mb-4">
               <div class="card-header"><h3 class="card-title">Riwayat Penggunaan Permit</h3></div>
-              <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
+              <div class="card-body">
+                <table id="usageTable" class="table table-striped table-hover mb-0">
                   <thead>
                     <tr>
                       <th>Tanggal Mulai</th>
@@ -153,5 +154,16 @@ if (isset($_GET['used'])) {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="../frontend_template/admin-lte-v4.10.1/dist/js/adminlte.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+      $(function () {
+        $('#usageTable').DataTable({
+          order: [[0, 'desc']],
+          columnDefs: [{ targets: -1, orderable: false, searchable: false }]
+        });
+      });
+    </script>
   </body>
 </html>

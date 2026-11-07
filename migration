@@ -1,0 +1,63 @@
+<?php
+// Migration script - uses same credentials/defaults as connection.php
+$host     = getenv('DB_HOST') ? getenv('DB_HOST') : 'db';
+$port     = getenv('DB_PORT') ? getenv('DB_PORT') : '3306';
+$username = getenv('DB_USER') ? getenv('DB_USER') : 'app';
+$password = getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : 'app';
+$database = getenv('DB_NAME') ? getenv('DB_NAME') : 'test_crud';
+
+$server = $host . ':' . $port;
+$conn = mysql_connect($server, $username, $password);
+if (!$conn) {
+    die('Connection failed: ' . mysql_error() . PHP_EOL);
+}
+mysql_query("SET NAMES 'utf8'", $conn);
+mysql_set_charset('utf8', $conn);
+
+$sql = "CREATE DATABASE IF NOT EXISTS `" . mysql_real_escape_string($database, $conn) . "` CHARACTER SET utf8 COLLATE utf8_general_ci";
+if (!mysql_query($sql, $conn)) {
+    die('Create database failed: ' . mysql_error() . PHP_EOL);
+}
+echo "Database `{$database}` ready." . PHP_EOL;
+
+if (!mysql_select_db($database, $conn)) {
+    die('Database selection failed: ' . mysql_error() . PHP_EOL);
+}
+
+$queries = array();
+
+$queries[] = "CREATE TABLE IF NOT EXISTS division (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    division_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+$queries[] = "CREATE TABLE IF NOT EXISTS karyawan (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    division_id BIGINT UNSIGNED NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    fullname VARCHAR(150) NOT NULL,
+    NIK VARCHAR(20) NOT NULL UNIQUE,
+    address TEXT,
+    gender ENUM('L', 'P') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_karyawan_division
+        FOREIGN KEY (division_id)
+        REFERENCES division(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+foreach ($queries as $q) {
+    if (!mysql_query($q, $conn)) {
+        die('Migration failed: ' . mysql_error() . PHP_EOL . 'SQL: ' . $q . PHP_EOL);
+    }
+}
+
+echo "Tables `division`, `karyawan` ready." . PHP_EOL;
+mysql_close($conn);
